@@ -1,19 +1,18 @@
-import 'package:appointmed/src/screens/login_screen.dart';
+import 'package:appointmed/src/screens/auth_screens/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 
-class PatientRegistrationScreen extends StatefulWidget {
-  const PatientRegistrationScreen({Key? key}) : super(key: key);
+class DoctorRegistrationScreen extends StatefulWidget {
+  const DoctorRegistrationScreen({Key? key}) : super(key: key);
 
   @override
-  _PatientRegistrationScreenState createState() =>
-      _PatientRegistrationScreenState();
+  _DoctorRegistrationScreenState createState() =>
+      _DoctorRegistrationScreenState();
 }
 
-class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
+class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
 
   late bool _visiblePassword;
@@ -25,14 +24,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   final _lastName = TextEditingController();
   final _email = TextEditingController();
   final _phone = TextEditingController();
-  final _region = TextEditingController();
-  final _city = TextEditingController();
-  final _district = TextEditingController();
-  final _street = TextEditingController();
   final _password = TextEditingController();
   final _confirmPassword = TextEditingController();
 
-  final String role = 'Patient';
+  final String role = 'Doctor';
 
   String? firstNameText;
   String? lastNameText;
@@ -40,10 +35,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   String? gender;
   String? emailText;
   String? phoneText;
-  String? regionText;
-  String? cityText;
-  String? districtText;
-  String? streetText;
   String? passwordText;
   String? confirmPasswordText;
 
@@ -52,6 +43,12 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       setState(() {
         isLogin = true;
       });
+      // final newUser = await _auth.createUserWithEmailAndPassword(
+      //     email: emailText, password: passwordText);
+
+      // _addDoctor(userID);
+
+      // sendDoctor(userID);
 
       Navigator.pushReplacement(
           context,
@@ -121,30 +118,31 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
     }
   }
 
-  sendUser(String userID) async {
-    // final String url = 'https://bcrecapc.ml/api/user/';
-    const String url = 'https://bcrecapc.ml/api/user/';
-    try {
-      var response = await http.post(Uri.parse(url), body: {
-        "registration_id": userID,
-        "user_name": lastNameText,
-        "user_gender": gender,
-        "mail_id": emailText,
-        "phone_no": phoneText
-      });
-      if (response.statusCode == 201) {
-        print(response.body);
-      } else {
-        print(response.statusCode);
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+  // void _addDoctor(String userID) {
 
-  void _addUser(String userID) {
-    //databaseReference.child(userID).set({'name': nameText, 'role': role});
-  }
+  // }
+
+  // sendDoctor(String userID) async {
+  //   // final String url = 'https://bcrecapc.ml/api/doctor/';
+  //   final String url = 'https://bcrecapc.ml/api/doctor/';
+  //   try {
+  //     var response = await http.post(Uri.parse(url), body: {
+  //       "registration_id": userID,
+  //       "doctor_registration_number": registrationNumberText,
+  //       "doctor_name": nameText,
+  //       "doctor_gender": _chosenValue,
+  //       "mail_id": emailText,
+  //       "phone_no": phoneText
+  //     });
+  //     if (response.statusCode == 201) {
+  //       print(response.body);
+  //     } else {
+  //       print(response.statusCode);
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   @override
   void initState() {
@@ -170,14 +168,14 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.4,
                   // color: Colors.red,
-                  child: Lottie.asset('assets/animations/patient.json'),
+                  child: Lottie.asset('assets/animations/doctor.json'),
                 ),
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.only(left: 20),
                   alignment: Alignment.centerLeft,
                   child: const Text(
-                    "User Registration Form",
+                    "Doctor Registration Form",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -199,13 +197,12 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            label: Text("First Name*"),
+                            label: const Text("First Name*"),
                             alignLabelWithHint: true,
                           ),
                           textInputAction: TextInputAction.next,
-                          textCapitalization: TextCapitalization.words,
                           controller: _firstName,
-                          validator: textValidate,
+                          validator: nameValidate,
                           onSaved: (value) {
                             firstNameText = value!;
                           },
@@ -220,13 +217,13 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            label: Text("Last Name*"),
+                            label: const Text("Last Name*"),
                             alignLabelWithHint: true,
                           ),
                           textInputAction: TextInputAction.next,
                           textCapitalization: TextCapitalization.words,
                           controller: _lastName,
-                          validator: textValidate,
+                          validator: nameValidate,
                           onSaved: (value) {
                             lastNameText = value!;
                           },
@@ -234,12 +231,12 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
 
                         //! Date of Birth
                         Container(
-                          margin: EdgeInsets.symmetric(vertical: 20),
+                          margin: const EdgeInsets.symmetric(vertical: 20),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: Colors.grey),
                           ),
-                          padding: EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(10),
                           child: Column(
                             children: [
                               Container(
@@ -250,14 +247,14 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 alignment: Alignment.topLeft,
-                                margin: EdgeInsets.all(5),
+                                margin: const EdgeInsets.all(5),
                               ),
                               Row(
                                 children: [
                                   Expanded(
                                     child: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 5),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
                                       child: Text(dateOfBirth == null
                                           ? 'Please choose a date'
                                           : DateFormat.yMMMd()
@@ -305,7 +302,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             });
                           },
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
 
@@ -349,90 +346,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        //! Region
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            label: Text("Region*"),
-                            alignLabelWithHint: true,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          textCapitalization: TextCapitalization.words,
-                          controller: _region,
-                          validator: textValidate,
-                          onSaved: (value) {
-                            regionText = value!;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        //! City
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            label: Text("City*"),
-                            alignLabelWithHint: true,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          textCapitalization: TextCapitalization.words,
-                          controller: _city,
-                          validator: textValidate,
-                          onSaved: (value) {
-                            cityText = value!;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        //! District
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            label: Text("District*"),
-                            alignLabelWithHint: true,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          textCapitalization: TextCapitalization.words,
-                          controller: _district,
-                          validator: textValidate,
-                          onSaved: (value) {
-                            districtText = value!;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        //! Street
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            label: Text("Street*"),
-                            alignLabelWithHint: true,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          textCapitalization: TextCapitalization.words,
-                          controller: _street,
-                          validator: textValidate,
-                          onSaved: (value) {
-                            streetText = value!;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-
                         //! Password
                         Row(
                           children: [
@@ -468,7 +381,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             const Spacer(),
                             const Tooltip(
                               message:
-                                  '\n\u2022 Include both lowercase and uppercase characters\n\u2022 Include atleast one number\n\u2022 Include atleast one special character\n\u2022 Be more than 6 characters long\n',
+                                  '\n\u2022 Include both lowercase and uppercase characters\n\u2022 Include atleast one number\n\u2022 Include atleast one special character\n\u2022 Be at least 8 characters long\n',
                               triggerMode: TooltipTriggerMode.tap,
                               showDuration: Duration(seconds: 5),
                               preferBelow: false,
@@ -476,7 +389,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 Icons.info_outline,
                                 color: Colors.grey,
                               ),
-                            )
+                            ),
                           ],
                         ),
                         const SizedBox(
@@ -523,6 +436,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             print(role);
+                            print(firstNameText);
                             print(lastNameText);
                             print(emailText);
                             print(phoneText);
@@ -549,6 +463,14 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
     );
   }
 
+  String? nameValidate(String? name) {
+    if (name!.isEmpty) {
+      return 'Field must not be empty';
+    } else {
+      return null;
+    }
+  }
+
   void _presentDatePicker() {
     showDatePicker(
       context: context,
@@ -561,14 +483,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         dateOfBirth = value;
       });
     });
-  }
-
-  String? textValidate(String? text) {
-    if (text!.isEmpty) {
-      return 'Field must not be empty';
-    } else {
-      return null;
-    }
   }
 
   String? emailValidate(String? email) {
@@ -587,8 +501,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   String? phoneValidate(String? phone) {
     if (phone!.isEmpty) {
       return 'Field must not be empty';
-    } else if (phone.length < 10 || phone.length > 10) {
-      return 'Phone number should contain 10 digits';
+    } else if (phone.length < 12 || phone.length > 12) {
+      return 'Phone number should contain 12 digits';
     } else {
       return null;
     }

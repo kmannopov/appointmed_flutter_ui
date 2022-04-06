@@ -56,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       print(error);
 
-      String errorText = getMessageFromErrorCode(error);
+      String errorText = error.toString();
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -72,43 +72,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       );
-    }
-  }
-
-  String getMessageFromErrorCode(error) {
-    switch (error.code) {
-      case "ERROR_EMAIL_ALREADY_IN_USE":
-      case "account-exists-with-different-credential":
-      case "email-already-in-use":
-        isLogin = false;
-        return "Email already used. Go to login page.";
-      case "ERROR_WRONG_PASSWORD":
-      case "wrong-password":
-        isLogin = false;
-        return "Wrong email/password combination.";
-      case "ERROR_USER_NOT_FOUND":
-      case "user-not-found":
-        isLogin = false;
-        return "No user found with this email.";
-      case "ERROR_USER_DISABLED":
-      case "user-disabled":
-        isLogin = false;
-        return "User disabled.";
-      case "ERROR_TOO_MANY_REQUESTS":
-      case "too-many-requests":
-        isLogin = false;
-        return "Too many requests to log into this account.";
-      case "ERROR_OPERATION_NOT_ALLOWED":
-      case "operation-not-allowed":
-        isLogin = false;
-        return "Server error, please try again later.";
-      case "ERROR_INVALID_EMAIL":
-      case "invalid-email":
-        isLogin = false;
-        return "Email address is invalid.";
-      default:
-        isLogin = false;
-        return "Login failed. Please try again.";
     }
   }
 

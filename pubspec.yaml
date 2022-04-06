@@ -1,5 +1,5 @@
 name: appointmed
-description: A new Flutter project.
+description: An easy-to-use and intuitive appointment scheduling system.
 
 publish_to: 'none'
 
@@ -14,20 +14,32 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   flutter_launcher_icons: ^0.9.2
-  flutter_svg: ^1.0.3
-  flutter_bloc: ^8.0.1
-  equatable: ^2.0.3
   flutter_secure_storage: ^5.0.2
   font_awesome_flutter: ^10.1.0
+  rxdart: ^0.27.3
+  connectivity: ^3.0.6
+  shared_preferences: ^2.0.13
+  page_transition: ^2.0.5
+  showcaseview: ^1.1.5
+  lottie: ^1.2.2
+  http: ^0.13.4
+  flutter_onboarding_slider: ^1.0.7
+  carousel_slider: ^4.0.0
+  auto_size_text_pk: ^3.0.0
+  google_fonts: ^2.3.1
+  intl: ^0.17.0
+  json_annotation: ^4.4.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  json_serializable: ^6.1.5
+  build_runner: ^2.1.8
   flutter_lints: ^1.0.0
 
 flutter_icons:
-  image_path: "assets/images/logo.png" 
+  image_path: "assets/icons/logo_small.png" 
   android: true
   ios: true
 
@@ -36,17 +48,18 @@ flutter:
 
   assets:
     - assets/icons/
-    - assets/img/
+    - assets/images/
+    - assets/animations/
 
-  fonts:
-    - family: WorkSansSemiBold
-      fonts:
-        - asset: assets/fonts/Work_Sans/WorkSans-SemiBold.ttf
+  # fonts:
+  #   - family: WorkSansSemiBold
+  #     fonts:
+  #       - asset: assets/fonts/Work_Sans/WorkSans-SemiBold.ttf
 
-    - family: WorkSansBold
-      fonts:
-        - asset: assets/fonts/Work_Sans/WorkSans-Bold.ttf
+  #   - family: WorkSansBold
+  #     fonts:
+  #       - asset: assets/fonts/Work_Sans/WorkSans-Bold.ttf
 
-    - family: WorkSansMedium
-      fonts:
-        - asset: assets/fonts/Work_Sans/WorkSans-Medium.ttf
+  #   - family: WorkSansMedium
+  #     fonts:
+  #       - asset: assets/fonts/Work_Sans/WorkSans-Medium.ttf

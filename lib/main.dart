@@ -1,6 +1,9 @@
+import 'package:appointmed/config/palette.dart';
+import 'package:appointmed/src/screens/utility_screens/restart.dart';
+import 'package:appointmed/src/screens/utility_screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'pages/login_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,18 +12,19 @@ void main() {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'TheGorgeousLogin',
-      home: LoginPage(),
-    );
-  }
+  //runApp(App());
+  runApp(
+    RestartWidget(
+      child: MaterialApp(
+        title: "AppointMed",
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: Palette.scaffoldColor,
+          fontFamily: GoogleFonts.poppins().fontFamily,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: const SplashScreen(),
+      ),
+    ),
+  );
 }

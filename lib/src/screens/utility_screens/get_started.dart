@@ -1,7 +1,8 @@
-import 'package:appointmed/src/screens/login_screen.dart';
-import 'package:appointmed/src/screens/registration_screens/doctor_registration_screen.dart';
-import 'package:appointmed/src/screens/registration_screens/patient_registration_screen.dart';
+import 'package:appointmed/src/screens/auth_screens/login_screen.dart';
+import 'package:appointmed/src/screens/auth_screens/doctor_registration_screen.dart';
+import 'package:appointmed/src/screens/auth_screens/patient_registration_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -13,6 +14,8 @@ class GetStartedScreen extends StatefulWidget {
 }
 
 class _GetStartedScreenState extends State<GetStartedScreen> {
+  final storage = const FlutterSecureStorage();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -87,7 +90,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
-                    print('pressed on doctor');
+                    storage.write(key: 'role', value: 'Doctor');
                     Navigator.push(
                         context,
                         PageTransition(
@@ -111,7 +114,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                               padding: const EdgeInsets.only(top: 10, left: 20),
                               child: const FaIcon(
                                 FontAwesomeIcons.userDoctor,
-                                size: 40,
+                                size: 85,
                               ),
                             ),
                             Container(
@@ -120,7 +123,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                               child: const Text(
                                 "I'm a doctor",
                                 style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                    fontSize: 25, fontWeight: FontWeight.bold),
                               ),
                             )
                           ],
@@ -143,7 +146,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
-                    print('pressed on patient');
+                    storage.write(key: 'role', value: 'Patient');
                     Navigator.push(
                         context,
                         PageTransition(
@@ -166,7 +169,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                               padding: const EdgeInsets.only(left: 20, top: 10),
                               child: const FaIcon(
                                 FontAwesomeIcons.bedPulse,
-                                size: 40,
+                                size: 85,
                               ),
                             ),
                             Container(
@@ -175,7 +178,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                               child: const Text(
                                 "I'm a patient",
                                 style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                    fontSize: 25, fontWeight: FontWeight.bold),
                               ),
                             )
                           ],
