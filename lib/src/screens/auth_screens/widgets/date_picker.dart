@@ -3,12 +3,12 @@ import 'package:intl/intl.dart';
 
 class DatePicker extends StatelessWidget {
   final DateTime? dateOfBirth;
-  final Function onSelected;
+  final Function updateValue;
 
   const DatePicker({
     Key? key,
     required this.dateOfBirth,
-    required this.onSelected,
+    required this.updateValue,
   }) : super(key: key);
 
   @override
@@ -41,7 +41,7 @@ class DatePicker extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () => onSelected,
+                onPressed: () => _presentDatePicker(context),
                 child: const Text(
                   'Choose Date',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -52,5 +52,18 @@ class DatePicker extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _presentDatePicker(BuildContext context) async {
+    var result = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365 * 80)),
+      lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      fieldHintText: "Date of Birth",
+    );
+
+    if (result == null) return;
+    updateValue(result);
   }
 }

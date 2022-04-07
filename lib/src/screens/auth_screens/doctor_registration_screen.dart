@@ -1,7 +1,14 @@
+import 'package:appointmed/src/extensions/input_validators.dart';
+import 'package:appointmed/src/models/auth/register_request.dart';
+import 'package:appointmed/src/models/doctor.dart';
+import 'package:appointmed/src/repositories/auth_repository.dart';
+import 'package:appointmed/src/repositories/doctor_repository.dart';
 import 'package:appointmed/src/screens/auth_screens/login_screen.dart';
+import 'package:appointmed/src/screens/auth_screens/widgets/date_picker.dart';
+import 'package:appointmed/src/screens/auth_screens/widgets/input_widget.dart';
+import 'package:appointmed/src/screens/auth_screens/widgets/password_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 
 class DoctorRegistrationScreen extends StatefulWidget {
@@ -14,10 +21,8 @@ class DoctorRegistrationScreen extends StatefulWidget {
 
 class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  late bool _visiblePassword;
-  late bool _visibleConfirmPassword;
-
+  final _authRepository = AuthRepository();
+  final _doctorRepository = DoctorRepository();
   bool isLogin = false;
 
   final _firstName = TextEditingController();
@@ -29,45 +34,65 @@ class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
 
   final String role = 'Doctor';
 
-  String? firstNameText;
-  String? lastNameText;
+  String? firstNameText,
+      lastNameText,
+      genderText,
+      emailText,
+      phoneText,
+      passwordText,
+      confirmPasswordText;
   DateTime? dateOfBirth;
-  String? gender;
-  String? emailText;
-  String? phoneText;
-  String? passwordText;
-  String? confirmPasswordText;
 
-  void _saveItem() async {
+  void _registerDoctor() async {
     try {
       setState(() {
         isLogin = true;
       });
-      // final newUser = await _auth.createUserWithEmailAndPassword(
-      //     email: emailText, password: passwordText);
 
-      // _addDoctor(userID);
+      var result = await _authRepository.register(RegisterRequest(
+          email: emailText!, password: passwordText!, role: role));
 
-      // sendDoctor(userID);
-
-      Navigator.pushReplacement(
-          context,
-          PageTransition(
-              child: const LoginScreen(),
-              type: PageTransitionType.rightToLeft));
+      if (result) {
+        var newDoctor = await _doctorRepository.registerDoctor(Doctor(
+            firstName: firstNameText!,
+            lastName: lastNameText!,
+            dateOfBirth: dateOfBirth!,
+            gender: genderText!,
+            phoneNumber: phoneText!,
+            email: emailText!));
+        if (newDoctor) {
+          showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                    title: const Text('Success'),
+                    content: const Text(
+                        'You have successfully registered. Please sign in using your credentials.'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ));
+          Navigator.pushReplacement(
+              context,
+              PageTransition(
+                  child: const LoginScreen(),
+                  type: PageTransitionType.rightToLeft));
+        }
+      }
     } catch (e) {
       setState(() {
         isLogin = false;
       });
-      print(e);
-
-      String errorText = getMessageFromErrorCode(e);
 
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: const Text('Error'),
-          content: Text(errorText),
+          content: Text(e.toString()),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -81,74 +106,9 @@ class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
     }
   }
 
-  String getMessageFromErrorCode(error) {
-    switch (error.code) {
-      case "ERROR_EMAIL_ALREADY_IN_USE":
-      case "account-exists-with-different-credential":
-      case "email-already-in-use":
-        isLogin = false;
-        return "Email already used. Go to login page.";
-      case "ERROR_WRONG_PASSWORD":
-      case "wrong-password":
-        isLogin = false;
-        return "Wrong email/password combination.";
-      case "ERROR_USER_NOT_FOUND":
-      case "user-not-found":
-        isLogin = false;
-        return "No user found with this email.";
-      case "ERROR_USER_DISABLED":
-      case "user-disabled":
-        isLogin = false;
-        return "User disabled.";
-      case "ERROR_TOO_MANY_REQUESTS":
-      case "too-many-requests":
-        isLogin = false;
-        return "Too many requests to log into this account.";
-      case "ERROR_OPERATION_NOT_ALLOWED":
-      case "operation-not-allowed":
-        isLogin = false;
-        return "Server error, please try again later.";
-      case "ERROR_INVALID_EMAIL":
-      case "invalid-email":
-        isLogin = false;
-        return "Email address is invalid.";
-      default:
-        isLogin = false;
-        return "Login failed. Please try again.";
-    }
-  }
-
-  // void _addDoctor(String userID) {
-
-  // }
-
-  // sendDoctor(String userID) async {
-  //   // final String url = 'https://bcrecapc.ml/api/doctor/';
-  //   final String url = 'https://bcrecapc.ml/api/doctor/';
-  //   try {
-  //     var response = await http.post(Uri.parse(url), body: {
-  //       "registration_id": userID,
-  //       "doctor_registration_number": registrationNumberText,
-  //       "doctor_name": nameText,
-  //       "doctor_gender": _chosenValue,
-  //       "mail_id": emailText,
-  //       "phone_no": phoneText
-  //     });
-  //     if (response.statusCode == 201) {
-  //       print(response.body);
-  //     } else {
-  //       print(response.statusCode);
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
-    _visiblePassword = false;
-    _visibleConfirmPassword = false;
   }
 
   @override
@@ -192,88 +152,31 @@ class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
                     child: Column(
                       children: [
                         //! First Name
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            label: const Text("First Name*"),
-                            alignLabelWithHint: true,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          controller: _firstName,
-                          validator: nameValidate,
-                          onSaved: (value) {
-                            firstNameText = value!;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        InputWidget(
+                            controller: _firstName,
+                            updateValue: (value) {
+                              firstNameText = value;
+                            },
+                            hintText: "First Name*",
+                            validator: InputValidators.textValidate),
 
                         //! Last Name
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            label: const Text("Last Name*"),
-                            alignLabelWithHint: true,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          textCapitalization: TextCapitalization.words,
-                          controller: _lastName,
-                          validator: nameValidate,
-                          onSaved: (value) {
-                            lastNameText = value!;
-                          },
-                        ),
+                        InputWidget(
+                            controller: _lastName,
+                            updateValue: (value) {
+                              lastNameText = value;
+                            },
+                            hintText: "Last Name*",
+                            validator: InputValidators.textValidate),
 
                         //! Date of Birth
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.grey),
-                          ),
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                            children: [
-                              Container(
-                                child: const Text(
-                                  "Date of Birth:",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                alignment: Alignment.topLeft,
-                                margin: const EdgeInsets.all(5),
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5),
-                                      child: Text(dateOfBirth == null
-                                          ? 'Please choose a date'
-                                          : DateFormat.yMMMd()
-                                              .format(dateOfBirth as DateTime)),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: _presentDatePicker,
-                                    child: const Text(
-                                      'Choose Date',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                        DatePicker(
+                            dateOfBirth: dateOfBirth,
+                            updateValue: (value) {
+                              setState(() {
+                                dateOfBirth = value;
+                              });
+                            }),
 
                         //! Gender
                         DropdownButtonFormField(
@@ -286,7 +189,7 @@ class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
                           validator: (value) =>
                               value == null ? 'Field must not be empty' : null,
                           isExpanded: true,
-                          value: gender,
+                          value: genderText,
                           items: [
                             'Male',
                             'Female',
@@ -298,7 +201,7 @@ class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
                           }).toList(),
                           onChanged: (String? value) {
                             setState(() {
-                              gender = value!;
+                              genderText = value!;
                             });
                           },
                         ),
@@ -307,120 +210,34 @@ class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
                         ),
 
                         //! Email
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            label: const Text('Email*'),
-                            alignLabelWithHint: true,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.emailAddress,
-                          controller: _email,
-                          validator: emailValidate,
-                          onSaved: (value) {
-                            emailText = value!;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        InputWidget(
+                            controller: _email,
+                            updateValue: (value) {
+                              emailText = value;
+                            },
+                            hintText: "Email*",
+                            validator: InputValidators.emailValidate),
 
                         //! Phone Number
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            label: const Text("Phone Number*"),
-                            alignLabelWithHint: true,
-                          ),
-                          keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.next,
-                          controller: _phone,
-                          validator: phoneValidate,
-                          onSaved: (value) {
-                            phoneText = value!;
-                          },
-                        ),
-                        const SizedBox(height: 20),
+                        InputWidget(
+                            controller: _phone,
+                            updateValue: (value) {
+                              phoneText = value;
+                            },
+                            hintText: "Phone Number*",
+                            validator: InputValidators.phoneValidate),
 
                         //! Password
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    label: const Text("Password*"),
-                                    alignLabelWithHint: true,
-                                    suffixIcon: IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _visiblePassword =
-                                                !_visiblePassword;
-                                          });
-                                        },
-                                        icon: Icon(_visiblePassword == true
-                                            ? Icons.visibility
-                                            : Icons.visibility_off))),
-                                obscureText: !_visiblePassword,
-                                obscuringCharacter: "\u2749",
-                                textInputAction: TextInputAction.next,
-                                controller: _password,
-                                validator: passwordValidate,
-                                onSaved: (value) {
-                                  passwordText = value!;
-                                },
-                              ),
-                            ),
-                            const Spacer(),
-                            const Tooltip(
-                              message:
-                                  '\n\u2022 Include both lowercase and uppercase characters\n\u2022 Include atleast one number\n\u2022 Include atleast one special character\n\u2022 Be at least 8 characters long\n',
-                              triggerMode: TooltipTriggerMode.tap,
-                              showDuration: Duration(seconds: 5),
-                              preferBelow: false,
-                              child: Icon(
-                                Icons.info_outline,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        //! Confirm Password
-                        TextFormField(
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              label: const Text("Confirm Password*"),
-                              alignLabelWithHint: true,
-                              suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _visibleConfirmPassword =
-                                          !_visibleConfirmPassword;
-                                    });
-                                  },
-                                  icon: Icon(_visibleConfirmPassword == true
-                                      ? Icons.visibility
-                                      : Icons.visibility_off))),
-                          obscureText: !_visibleConfirmPassword,
-                          textInputAction: TextInputAction.go,
-                          obscuringCharacter: "\u2749",
-                          controller: _confirmPassword,
-                          validator: confirmPasswordValidate,
-                          onSaved: (value) {
-                            confirmPasswordText = value!;
+                        PasswordInput(
+                          validator: InputValidators.passwordValidate,
+                          confirmPassValidator: confirmPasswordValidate,
+                          passController: _password,
+                          confirmPassController: _confirmPassword,
+                          updatePass: (value) {
+                            passwordText = value;
+                          },
+                          updateConfirmPass: (value) {
+                            confirmPasswordText = value;
                           },
                         ),
                       ],
@@ -434,19 +251,38 @@ class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
                     ? ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
-                            print(role);
-                            print(firstNameText);
-                            print(lastNameText);
-                            print(emailText);
-                            print(phoneText);
-                            print(passwordText);
-                            print(confirmPasswordText);
-
-                            _saveItem();
-                            FocusScope.of(context).unfocus();
+                            if (dateOfBirth != null) {
+                              _formKey.currentState!.save();
+                              _registerDoctor();
+                              FocusScope.of(context).unfocus();
+                            } else {
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                        title: const Text('Error'),
+                                        content: const Text(
+                                            'Please select a date of birth'),
+                                        actions: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('Close'),
+                                          ),
+                                        ],
+                                      ));
+                            }
                           }
                         },
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0),
+                          )),
+                          minimumSize: MaterialStateProperty.all<Size>(Size(
+                              MediaQuery.of(context).size.width * 0.9, 65)),
+                        ),
                         child: const Text('Register'),
                       )
                     : const Center(
@@ -461,65 +297,6 @@ class _DoctorRegistrationScreenState extends State<DoctorRegistrationScreen> {
         ),
       ),
     );
-  }
-
-  String? nameValidate(String? name) {
-    if (name!.isEmpty) {
-      return 'Field must not be empty';
-    } else {
-      return null;
-    }
-  }
-
-  void _presentDatePicker() {
-    showDatePicker(
-      context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
-      firstDate: DateTime.now().subtract(const Duration(days: 365 * 80)),
-      lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
-    ).then((value) {
-      if (value == null) return;
-      setState(() {
-        dateOfBirth = value;
-      });
-    });
-  }
-
-  String? emailValidate(String? email) {
-    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-    final regEx = RegExp(pattern);
-
-    if (email!.isEmpty) {
-      return 'Field must not be empty';
-    } else if (!regEx.hasMatch(email)) {
-      return 'Enter a valid email';
-    } else {
-      return null;
-    }
-  }
-
-  String? phoneValidate(String? phone) {
-    if (phone!.isEmpty) {
-      return 'Field must not be empty';
-    } else if (phone.length < 12 || phone.length > 12) {
-      return 'Phone number should contain 12 digits';
-    } else {
-      return null;
-    }
-  }
-
-  String? passwordValidate(String? password) {
-    String pattern =
-        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
-    final regEx = RegExp(pattern);
-
-    if (password!.isEmpty) {
-      return 'Field must not be empty';
-    } else if (!regEx.hasMatch(password)) {
-      return "Choose a strong password";
-    } else {
-      return null;
-    }
   }
 
   String? confirmPasswordValidate(String? confirmPassword) {

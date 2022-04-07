@@ -1,23 +1,24 @@
 import 'package:appointmed/config/palette.dart';
-import 'package:appointmed/src/screens/patient_screens/patient_profile.dart';
-import 'package:appointmed/src/screens/patient_screens/patient_welcome_screen.dart';
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 
-class PatientHome extends StatefulWidget {
-  const PatientHome({Key? key}) : super(key: key);
+import 'doctor_page.dart';
+import 'home_page.dart';
+
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
-  State<PatientHome> createState() => _PatientHomeState();
+  _HomeState createState() => _HomeState();
 }
 
-class _PatientHomeState extends State<PatientHome> {
+class _HomeState extends State<Home> {
   final List<Widget> _pages = [
-    const PatientWelcomePage(),
+    const HomePage(),
+    const DoctorPage(),
     //const ChatPage(),
     Container(),
-    Container(),
-    const PatientProfile(),
+    Container()
   ];
 
   int _currentIndex = 0;

@@ -1,6 +1,13 @@
+import 'package:appointmed/src/extensions/error_dialog.dart';
+import 'package:appointmed/src/models/auth/login_request.dart';
+import 'package:appointmed/src/repositories/auth_repository.dart';
+import 'package:appointmed/src/screens/doctor_screens/doctor_home.dart';
+import 'package:appointmed/src/screens/patient_screens/patient_home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -11,12 +18,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _authRepository = AuthRepository();
+  final storage = const FlutterSecureStorage();
 
   final _email = TextEditingController();
   final _password = TextEditingController();
 
-  late String emailText;
-  late String passwordText;
+  late String emailText, passwordText;
 
   late bool _isPasswordVisible;
   bool isLogin = false;
@@ -27,64 +35,40 @@ class _LoginScreenState extends State<LoginScreen> {
         isLogin = true;
       });
 
-      setState(() {
-        // if (snapshot.value['role'] == 'Doctor') {
-        //   setDoctorDetails(userId);
-        //   Navigator.pushReplacement(
-        //     context,
-        //     PageTransition(
-        //         child: ShowCaseWidget(
-        //           builder: Builder(builder: (context) => DoctorScreen()),
-        //         ),
-        //         type: PageTransitionType.rightToLeftWithFade),
-        //   );
-        // } else if (snapshot.value['role'] == 'User') {
-        //   setUserDetails(userId);
-        //   Navigator.pushReplacement(
-        //       context,
-        //       PageTransition(
-        //           child: ShowCaseWidget(
-        //             builder: Builder(builder: (context) => UserHome(userId)),
-        //           ),
-        //           type: PageTransitionType.rightToLeftWithFade));
-        // }
-      });
-      // print(userId);
+      if (await _authRepository
+          .signIn(LoginRequest(email: emailText, password: passwordText))) {
+        var role = await storage.read(key: 'role');
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          setState(() {
+            if (role == 'Doctor') {
+              Navigator.pushReplacement(
+                context,
+                PageTransition(
+                    child: ShowCaseWidget(
+                      builder:
+                          Builder(builder: (context) => const DoctorHome()),
+                    ),
+                    type: PageTransitionType.rightToLeftWithFade),
+              );
+            } else if (role == 'Patient') {
+              Navigator.pushReplacement(
+                  context,
+                  PageTransition(
+                      child: ShowCaseWidget(
+                        builder:
+                            Builder(builder: (context) => const PatientHome()),
+                      ),
+                      type: PageTransitionType.rightToLeftWithFade));
+            }
+          });
+        });
+      }
     } catch (error) {
       setState(() {
         isLogin = false;
       });
-      print(error);
-
-      String errorText = error.toString();
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Error"),
-          content: Text(errorText),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Close'),
-            ),
-          ],
-        ),
-      );
+      ErrorDialog.show(context: context, message: error.toString());
     }
-  }
-
-  setDoctorDetails(String doctorId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('role', 'Doctor');
-    prefs.setString('doctorId', doctorId);
-  }
-
-  setUserDetails(String userId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('role', 'User');
-    prefs.setString('userId', userId);
   }
 
   @override
@@ -100,7 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
         body: SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          // color: Colors.red,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
@@ -189,9 +172,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             _formKey.currentState!.save();
                             _signIn();
                           }
-                          print(emailText);
-                          print(passwordText);
-
                           FocusScope.of(context).unfocus();
                         },
                         child: const Text('Login'),

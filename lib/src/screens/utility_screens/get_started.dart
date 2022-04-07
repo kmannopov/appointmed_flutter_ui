@@ -23,7 +23,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
         body: SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          // color: Colors.red,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
@@ -39,7 +38,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                   width: MediaQuery.of(context).size.width,
                   child: InkWell(
                     onTap: () {
-                      print('pressed on login');
                       Navigator.push(
                           context,
                           PageTransition(
@@ -101,7 +99,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                     height: MediaQuery.of(context).size.height * 0.2,
                     width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
-                      // color: Colors.blue,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(),
                     ),

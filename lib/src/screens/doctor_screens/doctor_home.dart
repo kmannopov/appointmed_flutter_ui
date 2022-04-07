@@ -1,23 +1,24 @@
 import 'package:appointmed/config/palette.dart';
-import 'package:appointmed/src/screens/patient_screens/patient_profile.dart';
-import 'package:appointmed/src/screens/patient_screens/patient_welcome_screen.dart';
+import 'package:appointmed/src/screens/doctor_screens/doctor_account_screen.dart';
+import 'package:appointmed/src/screens/doctor_screens/doctor_appointments_screen.dart';
+import 'package:appointmed/src/screens/doctor_screens/doctor_workplace_screen.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 
-class PatientHome extends StatefulWidget {
-  const PatientHome({Key? key}) : super(key: key);
+class DoctorHome extends StatefulWidget {
+  const DoctorHome({Key? key}) : super(key: key);
 
   @override
-  State<PatientHome> createState() => _PatientHomeState();
+  State<DoctorHome> createState() => _DoctorHomeState();
 }
 
-class _PatientHomeState extends State<PatientHome> {
+class _DoctorHomeState extends State<DoctorHome> {
   final List<Widget> _pages = [
-    const PatientWelcomePage(),
-    //const ChatPage(),
+    const DoctorAppointmentsPage(),
+    const DoctorWorkplacePage(),
+    const DoctorAccountPage(),
     Container(),
-    Container(),
-    const PatientProfile(),
+    Container()
   ];
 
   int _currentIndex = 0;
@@ -53,12 +54,6 @@ class _PatientHomeState extends State<PatientHome> {
               title: const Text('Doctor'),
               icon: const Icon(Icons.medical_services_rounded),
               textAlign: TextAlign.center),
-          // BottomNavyBarItem(
-          //     activeColor: Palette.primary,
-          //     inactiveColor: Colors.black,
-          //     title: const Text('Chat'),
-          //     icon: const Icon(CupertinoIcons.chat_bubble_2_fill),
-          //     textAlign: TextAlign.center),
           BottomNavyBarItem(
               activeColor: Palette.primary,
               inactiveColor: Colors.black,

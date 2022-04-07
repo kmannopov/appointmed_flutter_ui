@@ -1,6 +1,9 @@
+import 'package:appointmed/src/models/address.dart';
 import 'package:appointmed/src/models/auth/register_request.dart';
+import 'package:appointmed/src/models/patient.dart';
 import 'package:appointmed/src/repositories/auth_repository.dart';
 import 'package:appointmed/src/extensions/input_validators.dart';
+import 'package:appointmed/src/repositories/patient_repository.dart';
 import 'package:appointmed/src/screens/auth_screens/login_screen.dart';
 import 'package:appointmed/src/screens/auth_screens/widgets/date_picker.dart';
 import 'package:appointmed/src/screens/auth_screens/widgets/input_widget.dart';
@@ -20,6 +23,7 @@ class PatientRegistrationScreen extends StatefulWidget {
 class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _authRepository = AuthRepository();
+  final _patientRepository = PatientRepository();
   bool isLogin = false;
 
   final _firstName = TextEditingController();
@@ -57,13 +61,44 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       var result = await _authRepository.register(RegisterRequest(
           email: emailText!, password: passwordText!, role: role));
 
-      if (result) {}
-
-      Navigator.pushReplacement(
-          context,
-          PageTransition(
-              child: const LoginScreen(),
-              type: PageTransitionType.rightToLeft));
+      if (result) {
+        var newPatient = await _patientRepository.registerPatient(Patient(
+            firstName: firstNameText!,
+            lastName: lastNameText!,
+            dateOfBirth: dateOfBirth!,
+            gender: genderText!,
+            address: Address(
+                city: cityText!,
+                district: districtText!,
+                region: regionText!,
+                street: streetText!,
+                latitude: 12.123123,
+                longitude: 12.123123),
+            phoneNumber: phoneText!,
+            email: emailText!));
+        if (newPatient) {
+          showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                    title: const Text('Success'),
+                    content: const Text(
+                        'You have successfully registered. Please sign in using your credentials.'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ));
+          Navigator.pushReplacement(
+              context,
+              PageTransition(
+                  child: const LoginScreen(),
+                  type: PageTransitionType.rightToLeft));
+        }
+      }
     } catch (e) {
       setState(() {
         isLogin = false;
@@ -153,7 +188,11 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                         //! Date of Birth
                         DatePicker(
                             dateOfBirth: dateOfBirth,
-                            onSelected: _presentDatePicker),
+                            updateValue: (value) {
+                              setState(() {
+                                dateOfBirth = value;
+                              });
+                            }),
 
                         //! Gender
                         DropdownButtonFormField(
@@ -262,12 +301,38 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                     ? ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
-
-                            _registerPatient();
-                            FocusScope.of(context).unfocus();
+                            if (dateOfBirth != null) {
+                              _formKey.currentState!.save();
+                              _registerPatient();
+                              FocusScope.of(context).unfocus();
+                            } else {
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                        title: const Text('Error'),
+                                        content: const Text(
+                                            'Please select a date of birth'),
+                                        actions: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('Close'),
+                                          ),
+                                        ],
+                                      ));
+                            }
                           }
                         },
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0),
+                          )),
+                          minimumSize: MaterialStateProperty.all<Size>(Size(
+                              MediaQuery.of(context).size.width * 0.9, 65)),
+                        ),
                         child: const Text('Register'),
                       )
                     : const Center(
@@ -282,21 +347,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         ),
       ),
     );
-  }
-
-  void _presentDatePicker() {
-    showDatePicker(
-      context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
-      firstDate: DateTime.now().subtract(const Duration(days: 365 * 80)),
-      lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
-      fieldHintText: "Date of Birth",
-    ).then((value) {
-      if (value == null) return;
-      setState(() {
-        dateOfBirth = value;
-      });
-    });
   }
 
   String? confirmPasswordValidate(String? confirmPassword) {

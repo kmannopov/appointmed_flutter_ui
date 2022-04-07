@@ -3,11 +3,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'patient.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class Patient {
-  final String firstName, lastName, email, phoneNumber;
+  final String firstName, lastName, gender, email, phoneNumber;
   final DateTime dateOfBirth;
-  final int gender;
   final Address address;
 
   Patient({

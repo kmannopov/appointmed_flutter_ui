@@ -1,70 +1,85 @@
-import 'dart:convert';
-
 import 'package:appointmed/config/palette.dart';
+import 'package:appointmed/src/extensions/error_dialog.dart';
+import 'package:appointmed/src/extensions/input_validators.dart';
+import 'package:appointmed/src/models/address.dart';
+import 'package:appointmed/src/models/patient.dart';
+import 'package:appointmed/src/repositories/patient_repository.dart';
+import 'package:appointmed/src/screens/auth_screens/widgets/input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PatientProfile extends StatefulWidget {
-  final String userId;
-  PatientProfile(this.userId);
+  const PatientProfile({Key? key}) : super(key: key);
 
   @override
-  _PatientProfileState createState() => _PatientProfileState(userId);
+  _PatientProfileState createState() => _PatientProfileState();
 }
 
 class _PatientProfileState extends State<PatientProfile> {
-  final String userId;
-  _PatientProfileState(this.userId);
-
-  late Map user;
-
+  _PatientProfileState();
+  final _patientRepository = PatientRepository();
+  final storage = const FlutterSecureStorage();
   final _formKey = GlobalKey<FormState>();
 
-  final _name = TextEditingController();
-  final _mail = TextEditingController();
-  final _gender = TextEditingController();
+  final _firstName = TextEditingController();
+  final _lastName = TextEditingController();
   final _phone = TextEditingController();
+  final _region = TextEditingController();
+  final _city = TextEditingController();
+  final _district = TextEditingController();
+  final _street = TextEditingController();
 
-  late String nameText;
-  late String mailText;
-  late String genderText;
-  late String phoneText;
-
-  late String userImage;
+  late String firstNameText,
+      lastNameText,
+      genderText,
+      phoneText,
+      regionText,
+      cityText,
+      districtText,
+      streetText;
+  Patient? patient;
 
   @override
   void initState() {
     super.initState();
-    getUserDetails();
+    getPatientInfo();
   }
 
-  void getUserDetails() async {
-    final String url = 'https://bcrecapc.ml/api/user/$userId/';
-    var response = await http.get(Uri.parse(url));
-    if (!mounted) return;
-    setState(() {
-      var convertJson = json.decode(response.body);
-      user = convertJson;
-      userImage = user['user_gender'];
-      print(userImage);
-    });
-  }
-
-  void updateUserDetails() async {
-    final String url = 'https://bcrecapc.ml/api/user/$userId/';
+  void getPatientInfo() async {
+    var userId = await storage.read(key: 'userId');
     try {
-      var response = await http.put(Uri.parse(url),
-          body: {"user_name": nameText, "phone_no": phoneText});
+      patient = await _patientRepository.getPatientById(userId!);
+      setState(() {});
+    } catch (error) {
+      ErrorDialog.show(context: context, message: error.toString());
+    }
+  }
 
-      if (response.statusCode == 200) {
+  void updatePatientInfo() async {
+    try {
+      var success = await _patientRepository.registerPatient(Patient(
+          firstName: firstNameText,
+          lastName: lastNameText,
+          dateOfBirth: patient!.dateOfBirth,
+          gender: genderText,
+          address: Address(
+              city: cityText,
+              district: districtText,
+              region: regionText,
+              street: streetText,
+              latitude: 12.123123,
+              longitude: 12.123123),
+          phoneNumber: phoneText,
+          email: patient!.email));
+      if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Profile Updated Successfully!!')));
+            const SnackBar(content: Text('Profile Updated Successfully!')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Something Went Wrong. Try Again Later!!!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Something Went Wrong.')));
       }
-    } catch (e) {
-      print(e);
+    } catch (error) {
+      ErrorDialog.show(context: context, message: error.toString());
     }
   }
 
@@ -73,8 +88,8 @@ class _PatientProfileState extends State<PatientProfile> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            'USER PROFILE',
+          title: const Text(
+            'PATIENT PROFILE',
             style: TextStyle(
               color: Colors.black,
             ),
@@ -82,193 +97,196 @@ class _PatientProfileState extends State<PatientProfile> {
           centerTitle: true,
           elevation: 0,
           backgroundColor: Palette.scaffoldColor,
-          iconTheme: IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: Colors.black),
         ),
-        body: user != null
-            ? Container(
+        body: patient != null
+            ? SizedBox(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
-                // color: Colors.red,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       Container(
                         height: 160,
-                        // width: 160,
-                        // color: Colors.red,
                         decoration: BoxDecoration(
                           color: Colors.blue,
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: AssetImage(
-                              userImage == 'Male'
-                                  ? 'assets/images/man.png'
-                                  : 'assets/images/woman.png',
-                            ),
+                            image: AssetImage(patient!.gender == 'Male'
+                                ? 'assets/images/man.png'
+                                : 'assets/images/woman.png'),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 40,
                       ),
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width * 0.9,
                         child: Form(
                           key: _formKey,
                           child: Column(
                             children: [
-                              //! User Name
+                              //! First Name
                               TextFormField(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  label: Text('Name*'),
+                                  label: const Text('First Name*'),
                                   alignLabelWithHint: true,
                                 ),
                                 textInputAction: TextInputAction.next,
-                                validator: _nameValidator,
-                                controller: _name..text = user['user_name'],
+                                validator: InputValidators.textValidate,
+                                controller: _firstName
+                                  ..text = patient!.firstName,
                                 onSaved: (value) {
-                                  nameText = value!;
+                                  firstNameText = value!;
                                 },
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 20,
                               ),
 
+                              //! Last Name
                               TextFormField(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  label: Text('Gender*'),
+                                  label: const Text('Last Name*'),
                                   alignLabelWithHint: true,
                                 ),
                                 textInputAction: TextInputAction.next,
-                                enabled: false,
-                                validator: _genderValidator,
-                                controller: _gender..text = user['user_gender'],
+                                validator: InputValidators.textValidate,
+                                controller: _lastName..text = patient!.lastName,
                                 onSaved: (value) {
-                                  genderText = value!;
+                                  firstNameText = value!;
                                 },
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 20,
                               ),
 
-                              //! User Email
-                              TextFormField(
+                              //! Gender
+                              DropdownButtonFormField(
                                 decoration: InputDecoration(
+                                  label: const Text("Choose Gender*"),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  label: Text('Email*'),
-                                  alignLabelWithHint: true,
                                 ),
-                                textInputAction: TextInputAction.next,
-                                validator: _mailValidator,
-                                enabled: false,
-                                controller: _mail..text = user['mail_id'],
-                                onSaved: (value) {
-                                  mailText = value!;
+                                validator: (value) => value == null
+                                    ? 'Field must not be empty'
+                                    : null,
+                                isExpanded: true,
+                                value: genderText,
+                                items: [
+                                  'Male',
+                                  'Female',
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    genderText = value!;
+                                  });
                                 },
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 20,
                               ),
 
                               //! User Phone
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  label: Text('Phone Number*'),
-                                  alignLabelWithHint: true,
-                                ),
-                                textInputAction: TextInputAction.next,
-                                validator: _phoneValidator,
-                                controller: _phone
-                                  ..text = user['phone_no'].toString(),
-                                onSaved: (value) {
-                                  phoneText = value!;
-                                },
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
+                              InputWidget(
+                                  controller: _phone,
+                                  updateValue: (value) {
+                                    phoneText = value;
+                                  },
+                                  hintText: "Phone Number*",
+                                  validator: InputValidators.phoneValidate),
+
+                              //! Region
+                              InputWidget(
+                                  controller: _region,
+                                  updateValue: (value) {
+                                    regionText = value;
+                                  },
+                                  hintText: "Region*",
+                                  validator: InputValidators.textValidate),
+                              //! City
+                              InputWidget(
+                                  controller: _city,
+                                  updateValue: (value) {
+                                    cityText = value;
+                                  },
+                                  hintText: "City*",
+                                  validator: InputValidators.textValidate),
+
+                              //! District
+                              InputWidget(
+                                  controller: _district,
+                                  updateValue: (value) {
+                                    districtText = value;
+                                  },
+                                  hintText: "District*",
+                                  validator: InputValidators.textValidate),
+
+                              //! Street
+                              InputWidget(
+                                  controller: _street,
+                                  updateValue: (value) {
+                                    streetText = value;
+                                  },
+                                  hintText: "Street*",
+                                  validator: InputValidators.textValidate),
                             ],
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 30,
                       ),
                       ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
-                            // print(nameText);
-                            // print(genderText);
-                            // print(mailText);
-                            // print(phoneText.toString());
-                            updateUserDetails();
-                            Future.delayed(Duration(seconds: 2), () {
-                              getUserDetails();
+                            updatePatientInfo();
+                            Future.delayed(const Duration(seconds: 2), () {
+                              getPatientInfo();
                             });
                           }
 
                           FocusScope.of(context).unfocus();
                         },
-                        child: Text(
+                        child: const Text(
                           'Update',
+                        ),
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0),
+                          )),
+                          minimumSize: MaterialStateProperty.all<Size>(Size(
+                              MediaQuery.of(context).size.width * 0.9, 65)),
                         ),
                       ),
                     ],
                   ),
                 ),
               )
-            : Center(
+            : const Center(
                 child: CircularProgressIndicator(),
               ),
       ),
     );
-  }
-
-  String? _nameValidator(String? name) {
-    if (name!.isEmpty) {
-      return "Field must not be empty";
-    } else {
-      return null;
-    }
-  }
-
-  String? _mailValidator(String? mail) {
-    if (mail!.isEmpty) {
-      return 'Field must not be empty';
-    } else {
-      return null;
-    }
-  }
-
-  String? _phoneValidator(String? phone) {
-    if (phone!.isEmpty) {
-      return 'Field must not be empty';
-    } else {
-      return null;
-    }
-  }
-
-  String? _genderValidator(String? gender) {
-    if (gender!.isEmpty) {
-      return 'Field must not be empty';
-    } else {
-      return null;
-    }
   }
 }
