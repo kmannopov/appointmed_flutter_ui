@@ -37,8 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (await _authRepository
           .signIn(LoginRequest(email: emailText, password: passwordText))) {
-        var role = await storage.read(key: 'role');
-        Future.delayed(const Duration(milliseconds: 1000), () {
+        Future.delayed(const Duration(seconds: 2), () async {
+          var role = await storage.read(key: 'role');
           setState(() {
             if (role == 'Doctor') {
               Navigator.pushReplacement(

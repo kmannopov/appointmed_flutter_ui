@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:appointmed/config/auth_config.dart';
 import 'package:appointmed/src/models/patient.dart';
 import 'package:appointmed/src/repositories/auth_repository.dart';
@@ -11,7 +11,7 @@ class PatientRepository {
   final storage = const FlutterSecureStorage();
   final _authRepository = AuthRepository();
   String? token;
-  var header;
+  Map<String, String>? header;
 
   PatientRepository() {
     _getToken();
@@ -27,7 +27,7 @@ class PatientRepository {
       return Patient.fromJson(json.decode(response.body));
     } else if (response.statusCode == 401) {
       _authRepository.refreshToken();
-      throw Exception('Unauthorized: ${jsonDecode(response.body)}');
+      throw Exception('Unauthorized: ${jsonDecode(response.body).toString()}');
     } else {
       var errorMessage = jsonDecode(response.body);
       throw Exception(errorMessage['errors']);
@@ -35,29 +35,32 @@ class PatientRepository {
   }
 
   Future<bool> registerPatient(Patient patient) async {
-    final response = await http.post(
-        Uri.parse(AuthConfig.baseUrl + trailingUrl),
-        headers: header,
-        body: json.encode(patient.toJson()));
+    _getToken();
+    final response = await Dio().post(
+      AuthConfig.baseUrl + trailingUrl,
+      data: json.encode(patient.toJson()),
+      options: Options(headers: header),
+    );
     if (response.statusCode == 201) {
       return true;
     } else if (response.statusCode == 401) {
-      throw Exception('Unauthorized');
+      var errorMessage = jsonDecode(response.data);
+      throw Exception(errorMessage['errors'][0].toString());
     } else {
-      var errorMessage = jsonDecode(response.body);
-      throw Exception(errorMessage['errors'][0]);
+      var errorMessage = jsonDecode(response.data);
+      throw Exception(errorMessage.toString());
     }
   }
 
   Future<bool> updatePatient(Patient patient) async {
-    final response = await http.put(Uri.parse(AuthConfig.baseUrl + trailingUrl),
-        headers: header, body: json.encode(patient.toJson()));
+    final response = await Dio().put(AuthConfig.baseUrl + trailingUrl,
+        data: json.encode(patient.toJson()), options: Options(headers: header));
     if (response.statusCode == 200) {
       return true;
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized');
     } else {
-      var errorMessage = jsonDecode(response.body);
+      var errorMessage = jsonDecode(response.data);
       throw Exception(errorMessage['errors'][0]);
     }
   }
@@ -65,9 +68,9 @@ class PatientRepository {
   void _getToken() async {
     token = await storage.read(key: 'token');
     header = {
-      'Content-Type': 'application/json;charset=UTF-8',
-      'Charset': 'utf-8',
-      'Authorization': 'Bearer $token',
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token'
     };
   }
 }

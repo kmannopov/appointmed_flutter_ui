@@ -1,6 +1,7 @@
 import 'package:appointmed/config/palette.dart';
 import 'package:appointmed/src/screens/patient_screens/patient_profile.dart';
 import 'package:appointmed/src/screens/patient_screens/patient_welcome_screen.dart';
+import 'package:appointmed/src/screens/schedule_screens/select_category.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -14,8 +15,8 @@ class PatientHome extends StatefulWidget {
 class _PatientHomeState extends State<PatientHome> {
   final List<Widget> _pages = [
     const PatientWelcomePage(),
-    //const ChatPage(),
     Container(),
+    const SelectCategoryScreen(),
     Container(),
     const PatientProfile(),
   ];
@@ -50,25 +51,25 @@ class _PatientHomeState extends State<PatientHome> {
           BottomNavyBarItem(
               activeColor: Palette.primary,
               inactiveColor: Colors.black,
-              title: const Text('Doctor'),
-              icon: const Icon(Icons.medical_services_rounded),
+              title: const Text('Clinics'),
+              icon: const Icon(Icons.business),
               textAlign: TextAlign.center),
-          // BottomNavyBarItem(
-          //     activeColor: Palette.primary,
-          //     inactiveColor: Colors.black,
-          //     title: const Text('Chat'),
-          //     icon: const Icon(CupertinoIcons.chat_bubble_2_fill),
-          //     textAlign: TextAlign.center),
           BottomNavyBarItem(
               activeColor: Palette.primary,
               inactiveColor: Colors.black,
-              title: const Text('Booking'),
+              title: const Text('Schedule'),
+              icon: const Icon(Icons.add_box),
+              textAlign: TextAlign.center),
+          BottomNavyBarItem(
+              activeColor: Palette.primary,
+              inactiveColor: Colors.black,
+              title: const Text('History'),
               icon: const Icon(Icons.event_note_rounded),
               textAlign: TextAlign.center),
           BottomNavyBarItem(
               activeColor: Palette.primary,
               inactiveColor: Colors.black,
-              title: const Text('Account'),
+              title: const Text('Profile'),
               icon: const Icon(Icons.manage_accounts_rounded),
               textAlign: TextAlign.center),
         ],

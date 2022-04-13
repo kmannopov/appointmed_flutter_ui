@@ -5,8 +5,11 @@ import 'package:appointmed/src/models/address.dart';
 import 'package:appointmed/src/models/patient.dart';
 import 'package:appointmed/src/repositories/patient_repository.dart';
 import 'package:appointmed/src/screens/auth_screens/widgets/input_widget.dart';
+import 'package:appointmed/src/screens/utility_screens/get_started.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class PatientProfile extends StatefulWidget {
   const PatientProfile({Key? key}) : super(key: key);
@@ -31,12 +34,12 @@ class _PatientProfileState extends State<PatientProfile> {
 
   late String firstNameText,
       lastNameText,
-      genderText,
       phoneText,
       regionText,
       cityText,
       districtText,
       streetText;
+  String? genderText;
   Patient? patient;
 
   @override
@@ -49,7 +52,23 @@ class _PatientProfileState extends State<PatientProfile> {
     var userId = await storage.read(key: 'userId');
     try {
       patient = await _patientRepository.getPatientById(userId!);
-      setState(() {});
+      setState(() {
+        _firstName.text = patient!.firstName;
+        _lastName.text = patient!.lastName;
+        _phone.text = patient!.phoneNumber;
+        _region.text = patient!.address.region;
+        _city.text = patient!.address.city;
+        _district.text = patient!.address.district;
+        _street.text = patient!.address.street;
+        firstNameText = patient!.firstName;
+        lastNameText = patient!.lastName;
+        phoneText = patient!.phoneNumber;
+        regionText = patient!.address.region;
+        cityText = patient!.address.city;
+        districtText = patient!.address.district;
+        streetText = patient!.address.street;
+        genderText = patient!.gender;
+      });
     } catch (error) {
       ErrorDialog.show(context: context, message: error.toString());
     }
@@ -57,11 +76,11 @@ class _PatientProfileState extends State<PatientProfile> {
 
   void updatePatientInfo() async {
     try {
-      var success = await _patientRepository.registerPatient(Patient(
+      var success = await _patientRepository.updatePatient(Patient(
           firstName: firstNameText,
           lastName: lastNameText,
           dateOfBirth: patient!.dateOfBirth,
-          gender: genderText,
+          gender: genderText!,
           address: Address(
               city: cityText,
               district: districtText,
@@ -74,6 +93,7 @@ class _PatientProfileState extends State<PatientProfile> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Profile Updated Successfully!')));
+        getPatientInfo();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Something Went Wrong.')));
@@ -88,6 +108,22 @@ class _PatientProfileState extends State<PatientProfile> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    PageTransition(
+                        child: ShowCaseWidget(
+                          builder: Builder(
+                              builder: (context) => const GetStartedScreen()),
+                        ),
+                        type: PageTransitionType.rightToLeftWithFade));
+                storage.deleteAll();
+              },
+              icon: const Icon(Icons.exit_to_app),
+            ),
+          ],
           title: const Text(
             'PATIENT PROFILE',
             style: TextStyle(
@@ -116,7 +152,7 @@ class _PatientProfileState extends State<PatientProfile> {
                           color: Colors.blue,
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: AssetImage(patient!.gender == 'Male'
+                            image: AssetImage(genderText == 'Male'
                                 ? 'assets/images/man.png'
                                 : 'assets/images/woman.png'),
                           ),
@@ -132,45 +168,22 @@ class _PatientProfileState extends State<PatientProfile> {
                           child: Column(
                             children: [
                               //! First Name
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  label: const Text('First Name*'),
-                                  alignLabelWithHint: true,
-                                ),
-                                textInputAction: TextInputAction.next,
-                                validator: InputValidators.textValidate,
-                                controller: _firstName
-                                  ..text = patient!.firstName,
-                                onSaved: (value) {
-                                  firstNameText = value!;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
+                              InputWidget(
+                                  controller: _firstName,
+                                  updateValue: (value) {
+                                    firstNameText = value;
+                                  },
+                                  hintText: "First Name*",
+                                  validator: InputValidators.textValidate),
 
                               //! Last Name
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  label: const Text('Last Name*'),
-                                  alignLabelWithHint: true,
-                                ),
-                                textInputAction: TextInputAction.next,
-                                validator: InputValidators.textValidate,
-                                controller: _lastName..text = patient!.lastName,
-                                onSaved: (value) {
-                                  firstNameText = value!;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
+                              InputWidget(
+                                  controller: _lastName,
+                                  updateValue: (value) {
+                                    lastNameText = value;
+                                  },
+                                  hintText: "Last Name*",
+                                  validator: InputValidators.textValidate),
 
                               //! Gender
                               DropdownButtonFormField(
@@ -251,32 +264,28 @@ class _PatientProfileState extends State<PatientProfile> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
-                            updatePatientInfo();
-                            Future.delayed(const Duration(seconds: 2), () {
-                              getPatientInfo();
-                            });
-                          }
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              updatePatientInfo();
+                            }
 
-                          FocusScope.of(context).unfocus();
-                        },
-                        child: const Text(
-                          'Update',
-                        ),
-                        style: ButtonStyle(
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50.0),
-                          )),
-                          minimumSize: MaterialStateProperty.all<Size>(Size(
-                              MediaQuery.of(context).size.width * 0.9, 65)),
+                            FocusScope.of(context).unfocus();
+                          },
+                          child: const Text(
+                            'Update',
+                          ),
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                            )),
+                            minimumSize: MaterialStateProperty.all<Size>(Size(
+                                MediaQuery.of(context).size.width * 0.9, 65)),
+                          ),
                         ),
                       ),
                     ],

@@ -115,11 +115,10 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(
           height: 25,
         ),
-        Container(
-            child: const Text(
+        const Text(
           "Popular Doctors",
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        )),
+        ),
         const SizedBox(height: 10),
         SingleChildScrollView(
           padding: const EdgeInsets.only(bottom: 5),

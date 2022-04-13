@@ -97,6 +97,22 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
               PageTransition(
                   child: const LoginScreen(),
                   type: PageTransitionType.rightToLeft));
+        } else {
+          showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                    title: const Text('Error'),
+                    content: const Text(
+                        'An error occurred while registering. Please try again.'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ));
         }
       }
     } catch (e) {
