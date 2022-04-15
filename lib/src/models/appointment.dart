@@ -9,6 +9,7 @@ class Appointment {
       doctorId,
       doctorName,
       patientId,
+      patientName,
       status,
       notes,
       id;
@@ -20,6 +21,7 @@ class Appointment {
       required this.doctorId,
       required this.doctorName,
       required this.patientId,
+      required this.patientName,
       required this.status,
       required this.notes,
       required this.id,

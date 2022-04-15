@@ -52,12 +52,41 @@ class _DoctorWorkplacePageState extends State<DoctorWorkplacePage> {
               name: name,
             ),
             const SizedBox(
-              height: 20,
+              height: 40,
             ),
-            const Text("Current Workplace: "),
-            const SizedBox(
-              height: 10,
-            ),
+            Column(
+              children: [
+                const Text(
+                  "Are you ready for another day of work?",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                if (doctor?.clinicId == null)
+                  const Text(
+                    "You are not assigned to a clinic yet. Please contact your system administrator.",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                (clinic != null)
+                    ? Center(
+                        child: Text(
+                          clinic!.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            )
           ],
         ),
       ),

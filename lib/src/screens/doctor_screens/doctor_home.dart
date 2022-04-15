@@ -16,9 +16,7 @@ class _DoctorHomeState extends State<DoctorHome> {
   final List<Widget> _pages = [
     const DoctorWorkplacePage(),
     const AppointmentList(role: "Doctor"),
-    const DoctorProfile(),
-    Container(),
-    Container()
+    const DoctorProfile()
   ];
 
   int _currentIndex = 0;
@@ -48,12 +46,6 @@ class _DoctorHomeState extends State<DoctorHome> {
               title: const Text('Home'),
               icon: const Icon(Icons.home),
               textAlign: TextAlign.center),
-          // BottomNavyBarItem(
-          //     activeColor: Palette.primary,
-          //     inactiveColor: Colors.black,
-          //     title: const Text('Doctor'),
-          //     icon: const Icon(Icons.medical_services_rounded),
-          //     textAlign: TextAlign.center),
           BottomNavyBarItem(
               activeColor: Palette.primary,
               inactiveColor: Colors.black,

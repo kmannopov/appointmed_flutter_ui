@@ -15,7 +15,7 @@ class AppointmentList extends StatefulWidget {
 
 class _AppointmentListState extends State<AppointmentList> {
   final _appointmentRepository = AppointmentRepository();
-  List<Appointment> appointments = [];
+  List<Appointment>? appointments;
 
   @override
   void initState() {
@@ -33,6 +33,7 @@ class _AppointmentListState extends State<AppointmentList> {
       }
       setState(() {
         appointments = result;
+        appointments!.sort((a, b) => a.dateTime.compareTo(b.dateTime));
       });
     } catch (error) {
       ErrorDialog.show(context: context, message: error.toString());
@@ -46,28 +47,36 @@ class _AppointmentListState extends State<AppointmentList> {
         height: MediaQuery.of(context).size.height * 0.9,
         width: MediaQuery.of(context).size.width,
         margin: const EdgeInsets.only(top: 40),
-        child: (appointments.isEmpty)
+        child: (appointments == null)
             ? const Center(child: CircularProgressIndicator())
-            : Column(children: [
-                const Text(
-                  "Your appointments: ",
-                  style: TextStyle(
-                    color: Palette.mainColor,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.8,
-                  child: ListView(
-                    children: [
-                      for (var appointment in appointments)
-                        AppointmentCard(
-                            appointment: appointment, role: widget.role),
-                    ],
-                  ),
-                ),
-              ]),
+            : (appointments!.isEmpty)
+                ? const Center(
+                    child: Text(
+                      "No appointments found",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  )
+                : Column(children: [
+                    const Text(
+                      "Your appointments: ",
+                      style: TextStyle(
+                        color: Palette.mainColor,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      child: ListView(
+                        children: [
+                          for (var appointment in appointments!)
+                            AppointmentCard(
+                                appointment: appointment, role: widget.role),
+                        ],
+                      ),
+                    ),
+                  ]),
       ),
     );
   }

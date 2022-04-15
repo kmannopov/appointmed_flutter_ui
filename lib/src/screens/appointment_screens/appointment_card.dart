@@ -63,7 +63,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     Text(
                       (widget.role == "Patient")
                           ? "Doctor: " + widget.appointment.doctorName
-                          : "",
+                          : "Patient: " + widget.appointment.patientName,
                       style: TextStyle(
                         color: Color(Palette.grey02),
                         fontSize: 12,
