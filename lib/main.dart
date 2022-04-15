@@ -30,7 +30,7 @@ void main() {
       child: MaterialApp(
         title: "AppointMed",
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Palette.primary,
           scaffoldBackgroundColor: Palette.scaffoldColor,
           fontFamily: GoogleFonts.poppins().fontFamily,
         ),
