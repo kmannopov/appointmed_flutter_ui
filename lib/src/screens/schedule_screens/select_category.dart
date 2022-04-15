@@ -94,9 +94,9 @@ class CategoryIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      foregroundDecoration: BoxDecoration(
-          color: Palette.primary.withOpacity(0.15),
-          borderRadius: const BorderRadius.all(Radius.circular(50))),
+      decoration: BoxDecoration(
+          color: Palette.primary.withOpacity(0.3),
+          borderRadius: const BorderRadius.all(Radius.circular(25))),
       alignment: Alignment.center,
       width: double.infinity,
       child: InkWell(
@@ -107,7 +107,7 @@ class CategoryIcon extends StatelessWidget {
                   child: SelectClinicScreen(category: text),
                   type: PageTransitionType.rightToLeftWithFade));
         },
-        borderRadius: const BorderRadius.all(Radius.circular(50)),
+        borderRadius: const BorderRadius.all(Radius.circular(25)),
         splashColor: Colors.deepPurple.shade200,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

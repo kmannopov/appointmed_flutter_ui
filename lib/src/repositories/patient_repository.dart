@@ -35,7 +35,7 @@ class PatientRepository {
   }
 
   Future<bool> registerPatient(Patient patient) async {
-    _getToken();
+    header = await _getToken();
     final response = await Dio().post(
       AuthConfig.baseUrl + trailingUrl,
       data: json.encode(patient.toJson()),
@@ -53,6 +53,7 @@ class PatientRepository {
   }
 
   Future<bool> updatePatient(Patient patient) async {
+    header = await _getToken();
     final response = await Dio().put(AuthConfig.baseUrl + trailingUrl,
         data: json.encode(patient.toJson()), options: Options(headers: header));
     if (response.statusCode == 200) {
@@ -65,12 +66,14 @@ class PatientRepository {
     }
   }
 
-  void _getToken() async {
+  Future<Map<String, String>?> _getToken() async {
     token = await storage.read(key: 'token');
-    header = {
+    var result = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Authorization': 'Bearer $token'
     };
+    header = result;
+    return result;
   }
 }

@@ -5,7 +5,7 @@ part 'doctor.g.dart';
 @JsonSerializable(explicitToJson: true)
 class Doctor {
   final String firstName, lastName, gender, email, phoneNumber;
-  final String? clinicId, departmentId;
+  final String? clinicId, departmentId, userId;
   final DateTime dateOfBirth;
 
   Doctor(
@@ -15,6 +15,7 @@ class Doctor {
       required this.gender,
       required this.phoneNumber,
       required this.email,
+      this.userId,
       this.clinicId,
       this.departmentId});
 

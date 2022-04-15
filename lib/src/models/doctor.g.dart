@@ -13,6 +13,7 @@ Doctor _$DoctorFromJson(Map<String, dynamic> json) => Doctor(
       gender: json['gender'] as String,
       phoneNumber: json['phoneNumber'] as String,
       email: json['email'] as String,
+      userId: json['userId'] as String?,
       clinicId: json['clinicId'] as String?,
       departmentId: json['departmentId'] as String?,
     );
@@ -25,5 +26,6 @@ Map<String, dynamic> _$DoctorToJson(Doctor instance) => <String, dynamic>{
       'phoneNumber': instance.phoneNumber,
       'clinicId': instance.clinicId,
       'departmentId': instance.departmentId,
+      'userId': instance.userId,
       'dateOfBirth': instance.dateOfBirth.toIso8601String(),
     };

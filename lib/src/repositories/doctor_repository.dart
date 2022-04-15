@@ -16,7 +16,7 @@ class DoctorRepository {
   }
 
   Future<Doctor> getDoctorById(String userId) async {
-    final response = await http.post(
+    final response = await http.get(
         Uri.parse(AuthConfig.baseUrl + trailingUrl + '/$userId'),
         headers: header);
     if (response.statusCode == 404) {

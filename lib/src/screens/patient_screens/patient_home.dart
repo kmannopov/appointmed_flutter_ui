@@ -1,4 +1,5 @@
 import 'package:appointmed/config/palette.dart';
+import 'package:appointmed/src/screens/appointment_screens/appointment_list.dart';
 import 'package:appointmed/src/screens/patient_screens/patient_profile.dart';
 import 'package:appointmed/src/screens/patient_screens/patient_welcome_screen.dart';
 import 'package:appointmed/src/screens/schedule_screens/select_category.dart';
@@ -15,9 +16,8 @@ class PatientHome extends StatefulWidget {
 class _PatientHomeState extends State<PatientHome> {
   final List<Widget> _pages = [
     const PatientWelcomePage(),
-    Container(),
     const SelectCategoryScreen(),
-    Container(),
+    const AppointmentList(role: "Patient"),
     const PatientProfile(),
   ];
 
@@ -48,12 +48,12 @@ class _PatientHomeState extends State<PatientHome> {
               title: const Text('Home'),
               icon: const Icon(Icons.home),
               textAlign: TextAlign.center),
-          BottomNavyBarItem(
-              activeColor: Palette.primary,
-              inactiveColor: Colors.black,
-              title: const Text('Clinics'),
-              icon: const Icon(Icons.business),
-              textAlign: TextAlign.center),
+          // BottomNavyBarItem(
+          //     activeColor: Palette.primary,
+          //     inactiveColor: Colors.black,
+          //     title: const Text('Clinics'),
+          //     icon: const Icon(Icons.business),
+          //     textAlign: TextAlign.center),
           BottomNavyBarItem(
               activeColor: Palette.primary,
               inactiveColor: Colors.black,

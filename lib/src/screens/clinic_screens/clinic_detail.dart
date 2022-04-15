@@ -1,8 +1,10 @@
 import 'package:appointmed/config/palette.dart';
 import 'package:appointmed/src/models/address.dart';
+import 'package:appointmed/src/screens/schedule_screens/select_doctor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import "package:latlong2/latlong.dart" as lat_long;
+import 'package:page_transition/page_transition.dart';
 
 class ClinicDetail extends StatelessWidget {
   const ClinicDetail(
@@ -37,6 +39,7 @@ class ClinicDetail extends StatelessWidget {
             child: DetailBody(
               clinicAddress: clinicAddress,
               clinicName: clinicName,
+              departmentId: departmentId,
             ),
           )
         ],
@@ -48,10 +51,12 @@ class ClinicDetail extends StatelessWidget {
 class DetailBody extends StatelessWidget {
   final String clinicName;
   final Address clinicAddress;
+  final String departmentId;
   const DetailBody({
     Key? key,
     required this.clinicName,
     required this.clinicAddress,
+    required this.departmentId,
   }) : super(key: key);
 
   @override
@@ -109,7 +114,13 @@ class DetailBody extends StatelessWidget {
                   Size(MediaQuery.of(context).size.width * 0.9, 65)),
             ),
             child: const Text('Book Appointment'),
-            onPressed: () => {},
+            onPressed: () => {
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      child: SelectDoctorScreen(departmentId: departmentId),
+                      type: PageTransitionType.rightToLeftWithFade))
+            },
           )
         ],
       ),
@@ -141,6 +152,17 @@ class ClinicLocation extends StatelessWidget {
             TileLayerOptions(
               urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
               subdomains: ['a', 'b', 'c'],
+            ),
+            MarkerLayerOptions(
+              markers: [
+                Marker(
+                  width: 80.0,
+                  height: 80.0,
+                  point: lat_long.LatLng(
+                      clinicAddress.latitude, clinicAddress.longitude),
+                  builder: (ctx) => const Icon(Icons.pin_drop_outlined),
+                ),
+              ],
             ),
           ],
         ),

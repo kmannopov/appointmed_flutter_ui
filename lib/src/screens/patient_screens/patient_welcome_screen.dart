@@ -53,7 +53,7 @@ class _PatientWelcomePageState extends State<PatientWelcomePage> {
         name = patient!.firstName + ' ' + patient!.lastName;
       });
     } catch (error) {
-      ErrorDialog.show(context: context, message: error.toString());
+      //ErrorDialog.show(context: context, message: error.toString());
     }
   }
 
@@ -78,10 +78,6 @@ class _PatientWelcomePageState extends State<PatientWelcomePage> {
             const SizedBox(
               height: 20,
             ),
-            // const CategoryIcons(),
-            // const SizedBox(
-            //   height: 20,
-            // ),
             const SizedBox(
               height: 20,
             ),
@@ -96,10 +92,10 @@ class _PatientWelcomePageState extends State<PatientWelcomePage> {
               height: 20,
             ),
             for (var doctor in doctors)
-              TopDoctorCard(
+              TopClinicCard(
                 img: doctor['img'],
-                doctorName: doctor['clinicName'],
-                doctorTitle: doctor['Specialization'],
+                clinicName: doctor['clinicName'],
+                clinicSpecialization: doctor['Specialization'],
               )
           ],
         ),
@@ -108,16 +104,16 @@ class _PatientWelcomePageState extends State<PatientWelcomePage> {
   }
 }
 
-class TopDoctorCard extends StatelessWidget {
+class TopClinicCard extends StatelessWidget {
   String img;
-  String doctorName;
-  String doctorTitle;
+  String clinicName;
+  String clinicSpecialization;
 
-  TopDoctorCard({
+  TopClinicCard({
     Key? key,
     required this.img,
-    required this.doctorName,
-    required this.doctorTitle,
+    required this.clinicName,
+    required this.clinicSpecialization,
   }) : super(key: key);
 
   @override
@@ -125,13 +121,7 @@ class TopDoctorCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 20),
       child: InkWell(
-        onTap: () {
-          // Navigator.push(
-          //     context,
-          //     PageTransition(
-          //         child: ClinicDetail(),
-          //         type: PageTransitionType.rightToLeftWithFade));
-        },
+        onTap: () {},
         child: Row(
           children: [
             Container(
@@ -148,7 +138,7 @@ class TopDoctorCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  doctorName,
+                  clinicName,
                   style: TextStyle(
                     color: Color(Palette.header01),
                     fontWeight: FontWeight.w700,
@@ -158,7 +148,7 @@ class TopDoctorCard extends StatelessWidget {
                   height: 5,
                 ),
                 Text(
-                  doctorTitle,
+                  clinicSpecialization,
                   style: TextStyle(
                     color: Color(Palette.grey02),
                     fontSize: 12,
@@ -189,65 +179,6 @@ class TopDoctorCard extends StatelessWidget {
             )
           ],
         ),
-      ),
-    );
-  }
-}
-
-List<Map> categories = [
-  {'icon': Icons.coronavirus, 'text': 'Covid 19'},
-  {'icon': Icons.local_hospital, 'text': 'Hospital'},
-  {'icon': Icons.car_rental, 'text': 'Ambulance'},
-  {'icon': Icons.local_pharmacy, 'text': 'Pill'},
-];
-
-class ScheduleCard extends StatelessWidget {
-  const ScheduleCard({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(Palette.bg01),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          Icon(
-            Icons.calendar_today,
-            color: Colors.white,
-            size: 15,
-          ),
-          SizedBox(
-            width: 5,
-          ),
-          Text(
-            'Mon, July 29',
-            style: TextStyle(color: Colors.white),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-          Icon(
-            Icons.access_alarm,
-            color: Colors.white,
-            size: 17,
-          ),
-          SizedBox(
-            width: 5,
-          ),
-          Flexible(
-            child: Text(
-              '11:00 ~ 12:10',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -60,60 +60,61 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
 
       var result = await _authRepository.register(RegisterRequest(
           email: emailText!, password: passwordText!, role: role));
-
       if (result) {
-        var newPatient = await _patientRepository.registerPatient(Patient(
-            firstName: firstNameText!,
-            lastName: lastNameText!,
-            dateOfBirth: dateOfBirth!,
-            gender: genderText!,
-            address: Address(
-                city: cityText!,
-                district: districtText!,
-                region: regionText!,
-                street: streetText!,
-                latitude: 12.123123,
-                longitude: 12.123123),
-            phoneNumber: phoneText!,
-            email: emailText!));
-        if (newPatient) {
-          showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                    title: const Text('Success'),
-                    content: const Text(
-                        'You have successfully registered. Please sign in using your credentials.'),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Close'),
-                      ),
-                    ],
-                  ));
-          Navigator.pushReplacement(
-              context,
-              PageTransition(
-                  child: const LoginScreen(),
-                  type: PageTransitionType.rightToLeft));
-        } else {
-          showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                    title: const Text('Error'),
-                    content: const Text(
-                        'An error occurred while registering. Please try again.'),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Close'),
-                      ),
-                    ],
-                  ));
-        }
+        Future.delayed(const Duration(milliseconds: 1000), () async {
+          var newPatient = await _patientRepository.registerPatient(Patient(
+              firstName: firstNameText!,
+              lastName: lastNameText!,
+              dateOfBirth: dateOfBirth!,
+              gender: genderText!,
+              address: Address(
+                  city: cityText!,
+                  district: districtText!,
+                  region: regionText!,
+                  street: streetText!,
+                  latitude: 12.123123,
+                  longitude: 12.123123),
+              phoneNumber: phoneText!,
+              email: emailText!));
+          if (newPatient) {
+            showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                      title: const Text('Success'),
+                      content: const Text(
+                          'You have successfully registered. Please sign in using your credentials.'),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    ));
+            Navigator.pushReplacement(
+                context,
+                PageTransition(
+                    child: const LoginScreen(),
+                    type: PageTransitionType.rightToLeft));
+          } else {
+            showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                      title: const Text('Error'),
+                      content: const Text(
+                          'An error occurred while registering. Please try again.'),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    ));
+          }
+        });
       }
     } catch (e) {
       setState(() {

@@ -1,7 +1,7 @@
 import 'package:appointmed/config/palette.dart';
-import 'package:appointmed/src/screens/doctor_screens/doctor_account_screen.dart';
-import 'package:appointmed/src/screens/doctor_screens/doctor_appointments_screen.dart';
-import 'package:appointmed/src/screens/doctor_screens/doctor_workplace_screen.dart';
+import 'package:appointmed/src/screens/appointment_screens/appointment_list.dart';
+import 'package:appointmed/src/screens/doctor_screens/doctor_profile.dart';
+import 'package:appointmed/src/screens/doctor_screens/doctor_welcome_screen.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -14,9 +14,9 @@ class DoctorHome extends StatefulWidget {
 
 class _DoctorHomeState extends State<DoctorHome> {
   final List<Widget> _pages = [
-    const DoctorAppointmentsPage(),
     const DoctorWorkplacePage(),
-    const DoctorAccountPage(),
+    const AppointmentList(role: "Doctor"),
+    const DoctorProfile(),
     Container(),
     Container()
   ];
@@ -48,16 +48,17 @@ class _DoctorHomeState extends State<DoctorHome> {
               title: const Text('Home'),
               icon: const Icon(Icons.home),
               textAlign: TextAlign.center),
+          // BottomNavyBarItem(
+          //     activeColor: Palette.primary,
+          //     inactiveColor: Colors.black,
+          //     title: const Text('Doctor'),
+          //     icon: const Icon(Icons.medical_services_rounded),
+          //     textAlign: TextAlign.center),
           BottomNavyBarItem(
               activeColor: Palette.primary,
               inactiveColor: Colors.black,
-              title: const Text('Doctor'),
-              icon: const Icon(Icons.medical_services_rounded),
-              textAlign: TextAlign.center),
-          BottomNavyBarItem(
-              activeColor: Palette.primary,
-              inactiveColor: Colors.black,
-              title: const Text('Booking'),
+              title: const FittedBox(
+                  fit: BoxFit.scaleDown, child: Text('Appointments')),
               icon: const Icon(Icons.event_note_rounded),
               textAlign: TextAlign.center),
           BottomNavyBarItem(
