@@ -1,16 +1,17 @@
-# appointmed
+Repo for the front end of Appointmed, an application developed as part of my final year project.
 
-A new Flutter project.
+## UI
 
-## Getting Started
+#### Splash Screen and Onboarding
 
-This project is a starting point for a Flutter application.
+ ![image](https://user-images.githubusercontent.com/79659647/175266519-c6512f01-dd81-4ce8-ae6c-42aa1c9b47c1.png)
 
-A few resources to get you started if this is your first Flutter project:
+ ![image](https://user-images.githubusercontent.com/79659647/175266596-57eb46d2-61e8-4679-89c3-dba15309b562.png)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+#### Registration Forms
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![image](https://user-images.githubusercontent.com/79659647/175266719-8d519aef-f363-4571-8455-eae1198a7cb9.png)
+
+#### Main Screens
+
+![image](https://user-images.githubusercontent.com/79659647/175266811-c4209fa0-e370-4d98-9f5a-6ef9df5cc25b.png)
